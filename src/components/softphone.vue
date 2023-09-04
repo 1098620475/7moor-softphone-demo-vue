@@ -1,40 +1,73 @@
 <template>
   <div class="box">
-     <div :class="['phone-bar', currentType]">{{textMap[currentType]}}{{currentMap}}</div>
-     <div>
-      <div v-if="isVisibleBtn('hangup')" @click="hangup">挂机</div>
-      <div v-if="isVisibleBtn('hold')" @click="hold">保持</div>
-      <div v-if="isVisibleBtn('unhold')" @click="unhold">取消保持</div>
+    当前状态: {{textMap[currentType] ? textMap[currentType] : currentType}}
+    <div><el-input v-model="phoneNumber"/></div>
+    <div class="oprate">
+     <el-button v-if="isVisibleBtn('outbound')" @click="dialoutTest">外呼</el-button>
+     <el-button v-if="isVisibleBtn('hangup')" @click="hangup">挂机</el-button>
+     <el-button v-if="isVisibleBtn('hold')" @click="hold">保持</el-button>
+     <el-button v-if="isVisibleBtn('unhold')" @click="unhold">取消保持</el-button>
+     <el-popover
+        placement="top"
+        width="250"
+        v-model="visible">
+        <div style="display: flex">
+          <el-input size="mini" type="text" v-model="transferNumber" />
+          <el-button type="primary" size="mini" @click="transfer">确认转接</el-button>
+        </div>
+        <el-button slot="reference" v-show="isVisibleBtn('transfer')">转接</el-button>
+      </el-popover>
+      <el-popover
+        placement="top"
+        width="250"
+        v-model="visible">
+        <div style="display: flex">
+          <el-input size="mini" type="text" v-model="transferNumber" />
+          <el-button type="primary" size="mini" @click="consult">确认咨询</el-button>
+        </div>
+        <el-button slot="reference" v-show="isVisibleBtn('consul')">咨询</el-button>
+      </el-popover>
+      <el-button v-if="isVisibleBtn('cancelConsult')" @click="cancelConsult">取消咨询</el-button>
+      <el-button v-if="isVisibleBtn('consultTranster')" @click="consultTranster">咨询转移</el-button>
+      <el-button v-if="isVisibleBtn('threepartycall')" @click="threepartycall">三方通话</el-button>
+       <el-button v-if="isVisibleBtn('satisfaction')" @click="satisfaction">满意度调查</el-button>
      </div>
-     <div class="keyboard-wrap">
-        <keyboard @dialout='dialoutTest'></keyboard>
-      </div>
-
-      <el-button>测试</el-button>
   </div>
 </template>
 
 <script>
-import move from './move';
-import SoftPhone from './softphone'
-import keyboard from './keyboard'
 let webapp = null
+import SoftPhone from './softphone'
 export default {
   name: 'telephone-strip',
   props: {
     
   },
   directives: {
-    move
+  
   },
   components: {
-    keyboard
+    
   },
   data () {
     return {
+      transferNumber: '',
+      phoneNumber: '',
       currentMap: '',
       currentType: '',
       renderMap: {
+        // 空闲
+        peerstate_Local: ['outbound'],
+        peerstate_gateway: ['outbound'],
+        peerstate_sip: ['outbound'],
+        // 咨询等待中
+        consultWaiting_Local: ['cancelConsult'],
+        consultWaiting_gateway: ['cancelConsult'],
+        consultWaiting_sip: ['cancelConsult'],
+        // 咨询通话中
+        consultTalking_Local: ['consultTranster', 'stopConsult', 'threepartycall'],
+        consultTalking_gateway: ['consultTranster', 'stopConsult', 'threepartycall'],
+        consultTalking_sip: ['consultTranster', 'stopConsult', 'threepartycall'],
         // 呼叫中
         dialing_Local: ['hangup', 'remark'],
         dialing_gateway: ['hangup', 'remark'],
@@ -76,7 +109,9 @@ export default {
         consultTalking_sip: ['hangup', 'threepartycall', 'closetheconsul', 'transferconsul', 'remark'],
         consultTalking_gateway: ['hangup', 'threepartycall', 'closetheconsul', 'transferconsul', 'remark'],
         // 三方通话
-        threeWayTalking: ['hangup', 'endthethreewaycall', 'remark'],
+        threeWayTalking_Local: ['hangup', 'endthethreewaycall', 'remark'],
+        threeWayTalking_gateway: ['hangup', 'endthethreewaycall', 'remark'],
+        threeWayTalking_sip: ['hangup', 'endthethreewaycall', 'remark'],
         rtckeys: ['unrtckeys', 'hangup'],
         satisfaction: ['unsatisfaction', 'hangup'],
         label: ['unlabel', 'hangup'],
@@ -122,15 +157,22 @@ export default {
         'transferDialing': '转接通话',
         'transfer': '转接通话',
         'dialTransfer': '外呼转接通话',
-        'hold': '保持'
+        'hold': '保持',
+        'transferWaiting': '转接中',
+        'consultWaiting': '咨询等待',
+        'consultTalking': '咨询通话中'
       }
     }
   },
   methods: {
-    dialoutTest (phone) {
-      console.log(phone, 'ppppppppppppppppp')
+    dialoutTest () {
+      const that = this;
+      if (!that.phoneNumber) {
+        this.$message.error('请输入外呼号码');
+        return
+      }
       webapp.callApi.dialout({
-      calleeNumber: phone,
+      calleeNumber: that.phoneNumber,
       fail: (res) => {
         console.log(res, 'sssssssss')
       },
@@ -155,6 +197,53 @@ export default {
     },
     unhold () {
       webapp.callApi.unhold({})
+    },
+    transfer() {
+      const that = this;
+      if (!that.transferNumber) {
+        this.$message.error('请输入转接号码');
+        return
+      }
+      webapp.callApi.transfer({
+        TransferNumber: that.transferNumber
+      })
+    },
+    consult(){
+      const that = this;
+      if (!that.transferNumber) {
+        this.$message.error('请输入咨询号码');
+        return
+      }
+      webapp.callApi.consult({
+        ConsultNumber: that.transferNumber
+      })
+    },
+    cancelConsult () {
+      webapp.callApi.cancelconsult({
+        success: (res) => {
+          console.log('取消咨询成功')
+        }
+      })
+    },
+    consultTranster () {
+      webapp.callApi.transferconsult({
+        success: (res) => {
+          console.log('咨询转移成功')
+        }
+      })
+    },
+    threepartycall () {
+      webapp.callApi.threewaycall({})
+    },
+    satisfaction () {
+      webapp.callApi.transferSatisfaction({})
+    },
+    getAgentPhoneBarList () {
+      webapp.agentApi.getAgentPhoneBarList({
+        success(res){
+          console.log(res, 'ooooooooooooooo')
+        }
+      })
     }
   },
   mounted () {
@@ -170,14 +259,20 @@ export default {
       console.log(e)
     },
     success(e) {
-
+       console.log('初始化成功')
+       webapp.agentApi.getAgentPhoneBarList({
+        success(res){
+          console.log(res, ';;;')
+        }
+       })
     }
   })
 
-    webapp.attachEvent({
+  webapp.attachEvent({
       message: (event) => {
         that.currentType = event.type
         that.currentMap = event.type + '_Local'
+        console.log(event, '通话事件--------------------')
       }
     })
   }
@@ -186,30 +281,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang='stylus'>
-.box
-  font-size: 14px;
-  position: fixed;
-  width: 320px;
-  z-index: 10000;
-  top: 200px;
-  left: 200px;
-  box-shadow: 0 0 16px rgba(0,0,0,.1);
-  border-radius: 8px;
-  box-sizing: border-box;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  background-color: hsla(0,0%,100%,.5);
-.peerstate
-    background: var(--color-primary);
-    display: flex;
-    align-items: center;
-    border-radius: 8px;
-    height: 36px;
-    padding: 0 12px;
-    padding-right: 0;
-    margin-bottom: 8px;
-    color: #fff;
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;  
+ .box
+   display: flex
+   flex-direction: column
+   max-width: 250px;
+   margin: 0 auto;
+   .oprate
+     margin-top: 20px;
+
 </style>

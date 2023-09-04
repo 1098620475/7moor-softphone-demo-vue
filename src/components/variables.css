@@ -1,0 +1,20 @@
+:root {
+  --color-primary: #1E63F5;
+  --color-danger: #FC5926;
+  --color-success: #59AF58;
+  --color-sub-blue: #66bdc7;
+  --color-sub-blue1: #7bcdd2;
+  --color-warning: #F3C63D;
+  --color-text-gray10: #ccc;
+  --color-text-gray9: #f0f2f3;
+  --color-text-gray8: #ebebeb;
+  --color-text-gray5: #666;
+  --color-text-gray4: #1f1f1f;
+  --color-text-gray3: #BDBDBD;
+  --color-text-gray1: #9E9E9E;
+  --color-text-gray0: #E9EFFE;
+  --color-text-white: #fff;
+  --color-border: #bfbfbf;
+  --color-border1: #e6e6e6
+}
+/* document.documentElement.style.setProperty("--color-primary", '#439ae9') */
