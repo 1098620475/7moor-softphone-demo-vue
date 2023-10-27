@@ -2,14 +2,23 @@
  * @Author: Wangtao
  * @Date: 2023-06-19 14:20:10
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-06-28 21:40:01
+ * @LastEditTime: 2023-10-27 10:34:42
 -->
 <template>
   <div id="app">
-    <router-view/>
+    <router-view></router-view>
   </div>
 </template>
-
+<script>
+import App from './components/index.vue';
+import './components/variables.css'
+export default {
+  name: 'telephone-strip',
+  components: {
+    App
+  }
+};
+</script>
 <style lang="scss">
 html,body{
   height: 100%;

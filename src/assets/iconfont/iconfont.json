@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "30878494",
+      "name": "键盘",
+      "font_class": "jianpan",
+      "unicode": "e74d",
+      "unicode_decimal": 59213
+    },
+    {
+      "icon_id": "30878506",
+      "name": "取消键盘",
+      "font_class": "quxiaojianpan",
+      "unicode": "e75d",
+      "unicode_decimal": 59229
+    },
+    {
       "icon_id": "1571236",
       "name": "咨询",
       "font_class": "zixun",

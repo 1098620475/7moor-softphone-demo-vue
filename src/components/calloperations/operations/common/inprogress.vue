@@ -2,7 +2,7 @@
  * @Author: Wangtao
  * @Date: 2022-11-09 14:32:57
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-06-27 19:11:37
+ * @LastEditTime: 2023-09-27 15:41:47
 -->
 <template>
 	<div class="consultation-box">
@@ -40,7 +40,7 @@ export default {
   methods: {
     phoneCancelTransfer() {
       // isTransfer为true是转接 为false是咨询
-      if (this.currentType === 'transter') {
+      if (this.currentType === 'transfer') {
         window.webapp.callApi.canceltransfer({
           success: function(){
             console.log('取消转接成功')

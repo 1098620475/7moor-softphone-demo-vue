@@ -2,7 +2,7 @@
  * @Author: Wangtao
  * @Date: 2022-11-07 14:41:13
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-07-06 15:22:45
+ * @LastEditTime: 2023-09-26 19:53:19
 -->
 <template>
 	<div class="switch-login-warp">
@@ -88,9 +88,6 @@ export default {
     isAutoAnswer () {
       return this.$store.state.webrtc.autoAnswer
     },
-    // mobile () {
-    //   return this.$store.state.session.user.mobile
-    // },
     alowSwitch () {
       return this.currentLoginType !== this.loginType
     }
@@ -99,6 +96,9 @@ export default {
     
   },
   methods: {
+    authAnswerChange(val) {
+      window.softphoneAutoAnswer = val
+    },
     cancel () {
       this.$emit('switchConfig', {status: false})
     },
@@ -201,6 +201,7 @@ export default {
     },
     setAutoAnswer (status) {
       // this.$store.commit('webrtc/SET_AUTO_ANSWER', status)
+      window.softphoneAutoAnswer = status;
     },
     updateUserPhone (phone, callback) {
       return new Promise((resolve) => {
@@ -248,7 +249,7 @@ export default {
     // this.gatewayExten = ''
     // 软电话是否自动接听
     // this.autoAnswer = this.isAutoAnswer
-
+    this.autoAnswer = window.softphoneAutoAnswer || false
     window.webapp.agentApi.getAgentInfo({
       success: (res)=>{
         let info = res.data

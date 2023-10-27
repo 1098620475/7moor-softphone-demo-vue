@@ -9,11 +9,16 @@
     "lib": "vue-cli-service build --target lib --name myLib"
   },
   "dependencies": {
+    "7moor-softphone-sdk": "^1.0.1",
     "core-js": "^3.8.3",
+    "fetch-jsonp": "^1.3.0",
+    "js-md5": "^0.7.3",
+    "jsencrypt": "^3.3.2",
     "sass": "^1.63.6",
     "sass-loader": "^13.3.2",
     "vue": "^2.6.14",
-    "vue-router": "^3.5.2"
+    "vue-router": "^3.5.2",
+    "webrtc-adapter": "^8.2.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

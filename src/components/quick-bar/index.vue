@@ -2,7 +2,7 @@
  * @Author: Wangtao
  * @Date: 2022-11-07 14:41:13
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-07-03 14:52:31
+ * @LastEditTime: 2023-09-26 20:04:33
 -->
 <template>
 	<div class="quick-bar">
@@ -43,6 +43,9 @@ export default {
     currentEventType: {
       type: String
     },
+    backType: {
+      type: String
+    },
     number: {
       type: String
     },
@@ -54,14 +57,29 @@ export default {
     currentEventType: {
       handler: function () {
         this.timeRecording('timing')
+        let mapData = ''
+        if (this.renderMap[this.currentEventType] && this.renderMap[this.currentEventType].length > 0) {
+          mapData = this.renderMap[this.currentEventType]
+        } else {
+
+          let key = this.currentEventType.split('_')[0]
+          mapData = this.renderMap[key] || ''
+        }
+        if (mapData && mapData.indexOf('accept') > -1) {
+          if (window && window.softphoneAutoAnswer) {
+            // 自动接听
+            this.answerClick()
+          }
+        }
       },
       immediate: true
     }  
   },
   computed: {
     showAnswer() {
-      // return this.$store.state.webrtc.showAnswer
-      return this.$store.state.webrtc.showAutoAnswer
+      // // return this.$store.state.webrtc.showAnswer
+      // return this.$store.state.webrtc.showAutoAnswer
+      return true
     },
     currentStyleClass() {
       // 给电话条底色根据状态添加class
@@ -70,6 +88,7 @@ export default {
     ctiUiDesc() {
       // 通话状态
       let eventType = this.currentEventType ? this.currentEventType.split('_')[0] : ''
+      let backType = this.backType? this.backType.split('_')[0] : ''
       if (eventType) {
         let textMap = {
           'dialing': '呼叫中',
@@ -97,7 +116,7 @@ export default {
           'satisfaction': '满意度调查',
           'transferWaiting': '转接操作'
         }
-        return textMap[eventType] || '未知事件'
+        return textMap[eventType] || textMap[backType]
       } else {
         return '未知事件'
       }
@@ -106,6 +125,18 @@ export default {
   data () {
     return {
       renderMap: {
+        // 空闲
+        peerstate_Local: ['outbound'],
+        peerstate_gateway: ['outbound'],
+        peerstate_sip: ['outbound'],
+        // 咨询等待中
+        consultWaiting_Local: ['cancelConsult'],
+        consultWaiting_gateway: ['cancelConsult'],
+        consultWaiting_sip: ['cancelConsult'],
+        // 咨询通话中
+        consultTalking_Local: ['consultTranster', 'stopConsult', 'threepartycall'],
+        consultTalking_gateway: ['consultTranster', 'stopConsult', 'threepartycall'],
+        consultTalking_sip: ['consultTranster', 'stopConsult', 'threepartycall'],
         // 呼叫中
         dialing_Local: ['hangup', 'remark'],
         dialing_gateway: ['hangup', 'remark'],
@@ -130,7 +161,6 @@ export default {
         consulOprate: ['unconsul', 'hangup'],
         // 转接操作
         transferOprate: ['untransfer', 'hangup'],
-        transferWaiting: ['untransfer', 'hangup'],
         // 外呼转接通话
         dialTransfer_Local: ['hangup', 'hold', 'transfer', 'consul', 'ivr', 'satisfaction', 'remark'], // 外呼通话
         dialTransfer_sip: ['hangup','hold', 'transfer', 'consul', 'ivr', 'satisfaction', 'remark', 'key'],
@@ -138,10 +168,10 @@ export default {
         // 内线呼叫
         innerDialing_Local: ['hangup'],
         innerDialing_gateway: ['hangup'],
-        innerDialing_sip: ['hangup'],
+        innerDialing_sip: ['hangup', 'accept'],
         // 转接振铃
         transferDialing_Local: ['hangup'],
-        transferDialing_sip: ['hangup'],
+        transferDialing_sip: ['hangup', 'accept'],
         transferDialing_gateway: ['hangup'],
         // 咨询通话
         consultTalking_Local: ['hangup', 'threepartycall', 'closetheconsul', 'transferconsul', 'remark'],
@@ -159,7 +189,7 @@ export default {
         innerTalking_sip: ['hangup'],
         innerTalking_gateway: ['hangup'],
         // 转接振铃
-        transferBelling_sip: ['hangup'],
+        transferBelling_sip: ['hangup', 'accept'],
         transferBelling_Local: ['hangup'],
         transferBelling_gateway: ['hangup'],
         // 转接通话
@@ -172,10 +202,10 @@ export default {
         listened_gateway: ['hangup'],
         // 监听振铃
         listening_Local: ['hangup'],
-        listening_sip: ['hangup'],
+        listening_sip: ['hangup', 'accept'],
         listening_gateway: ['hangup'],
         // 内部通话振铃
-        innerBelling_sip: ['hangup'],
+        innerBelling_sip: ['hangup', 'accept'],
         innerBelling_gateway: ['hangup'],
         innerBelling_Local: ['hangup']
       },
@@ -205,7 +235,7 @@ export default {
       }
     },
     answerClick() {
-      this.$store.dispatch('Answer')
+      window.webapp.webrtcApi.answer()
     },
     timeRecording (type, timestamp) {
       this.$nextTick(()=>{

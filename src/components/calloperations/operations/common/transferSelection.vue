@@ -2,7 +2,7 @@
  * @Author: Wangtao
  * @Date: 2022-11-09 09:37:25
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-07-03 14:54:39
+ * @LastEditTime: 2023-09-20 14:26:49
 -->
 <template>
 	<div class="transfer-selection-box">
@@ -154,9 +154,29 @@ export default {
           type: 'in',
           TransferReason: that.TransferReason,
           fail: (res) => {
-            console.log(res)
+            this.$refs.selectTree.blur();
+            if (res.message === '310') { // 转接失败: 未配置外呼线路
+              this.$message.error('转接失败: 未配置外呼线路')
+            } else if (res.message === '311') { // 转接失败: 转接的用户忙
+              this.$message.error('转接失败: 转接的用户忙')
+            } else if (res.message === '312') { // 转接失败: 转接的用户未签入
+              this.$message.error('转接失败: 转接的用户未签入')
+            } else if (res.message === '313') { // 转接失败: 转接的用户正在通话
+              this.$message.error('转接失败: 转接的用户正在通话')
+            } else if (res.message === '314') { // 转接失败: 转接的用户没有以通话方式登录
+              this.$message.error('转接失败: 转接的用户没有以通话方式登录')
+            } else if (res.message === '315') { // 转接失败: 无法呼通转接的用户
+              this.$message.error('转接失败: 无法呼通转接的用户')
+            } else if (res.message === '316') { // 转接失败: 转接用户不存在
+              this.$message.error('转接失败: 转接用户不存在')
+            } else if (res.message === '318') {
+              this.$message.error('转接失败: 转接用户不存在')
+            } else { // 转接失败
+              this.$message.error('转接失败')
+            }
           },
           success: (res) => {
+            this.$refs.selectTree.blur();
             console.log('转接成功')
           }
         }) 
@@ -169,6 +189,7 @@ export default {
           },
           success: (res) => {
             console.log('转接成功')
+            this.$refs.selectTree.blur();
           }
         })
       }
@@ -188,7 +209,6 @@ export default {
           TransferNumber: number,
           TransferReason: that.TransferReason,
           fail: (res) => {
-            console.log(res, 'sssssssss')
           },
           success: (res) => {
             console.log('转接成功')

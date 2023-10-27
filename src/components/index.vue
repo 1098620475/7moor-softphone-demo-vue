@@ -34,7 +34,7 @@
       </div>
       <div class="keyboard-wrap" v-show="!showConfig">
         <keyboard v-show="!onTheCallState && !isUnregister"></keyboard>
-        <call-operations :eventType='currentMapType' v-if="onTheCallState"></call-operations>
+        <call-operations :attachData='attachData' :eventType='currentMapType' v-if="onTheCallState"></call-operations>
       </div>
       <switchLoginType @switchConfig='goToSetting' v-if="showConfig"></switchLoginType>
     </div>
@@ -50,6 +50,9 @@ import keyboard from './keyboard'
 import callOperations from './calloperations/index'
 
 import switchLoginType from './switchLoginType'
+
+import SoftPhone from '7moor-softphone-sdk'
+
 
 
 export default {
@@ -81,6 +84,8 @@ export default {
       this.phoneBarStauts.some((state) => {
         if (state.value === this.currentPeerstate) {
           desc = state.label
+        } else if (this.currentPeerstate === '99') {
+          desc = '后处理'
         }
       });
       return desc
@@ -146,7 +151,12 @@ export default {
             webapp.attachEvent({
               message: (event) => {
                 that.currentEventType = event.type
-                that.currentMapType = event.type + '_' + loginType
+                that.currentMapType = event.type + '_' + that.currentLoginType
+                if (event.attachData) {
+                  that.attachData = event.attachData
+                } else {
+                  that.attachData = {}
+                }
                 console.log(event, '通话事件--------------------')
                 if (event.type === 'kick') {
                   this.$alert('您当前的会话已经失效,导致该问题的原因是别的座席使用相同的帐号（或相同的分机）登录了', '提示', {
@@ -158,7 +168,7 @@ export default {
                       })
                     });
                 }
-                const timeType = event.statusNumber === '5' ? 'countDown' : 'timing';
+                const timeType = event.typeValue && event.typeValue === '99' ? 'countDown' : 'timing';
                 that.setPeerState(event)
                 if (event.statusTime) {
                   this.timeRecording(timeType, event.statusTime);
@@ -208,11 +218,34 @@ export default {
       currentPeerstate: '',
       currentEventType: 'unregister',
       currentMapType: 'unregister_Local',
-      currentLoginType: 'Local'
+      currentLoginType: 'Local',
+      ruleForm: {
+        username: '20011@pkjtest-wh',
+        password:'123456Aa',
+        pbxUrl: 'http://10.1.114.11:18082',
+        accountId: 'N00000004285'
+      },
+      attachData: {}
     }
   },
   mounted () {
-    this.initSoftPhone()
+    let that = this;
+    that.initSoftPhone()
+    // window.webapp = new SoftPhone({
+    //   accountId: that.ruleForm.accountId,
+    //   agentNumber: that.ruleForm.username,
+    //   password: that.ruleForm.password,
+    //   loginType: 'Local',
+    //   serviceAddress: 'https://dev-kf.7moor.com:3443',
+    //   proxy_url: that.ruleForm.pbxUrl,
+    //   error(e){
+    //     console.log(e)
+    //   },
+    //   success(e) {
+    //     window.token = true
+    //     that.initSoftPhone()
+    //   }
+    // })
   }
 };
 </script>

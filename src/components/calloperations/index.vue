@@ -2,12 +2,12 @@
  * @Author: Wangtao
  * @Date: 2022-11-07 14:41:13
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-07-03 15:52:20
+ * @LastEditTime: 2023-09-26 18:48:14
 -->
 <template>
 	<div class="call-operations-box">
     <div class="quick-box" @mouseenter='onMouseenter' @mouseleave="onMouseleave">
-      <quick-bar :currentEventType='currentEventType'></quick-bar>
+      <quick-bar :currentEventType='currentEventType' :backType='backType'></quick-bar>
       <div class='oprate-warp' v-show="showOprate">
         <div class="on-the-call-btn" v-show="true">
           <div class="call-btn" @click="phoneHold" v-if="isVisibleBtn('hold')">
@@ -97,13 +97,16 @@
             <endthethreewaycall></endthethreewaycall>
           </div>
           <div class='TransferReason'>
-            <div class="tip" v-if="transferData.TransferReason && showTransferReason">
+            <div class="tip" v-if="attachData.TransferReason && showTransferReason">
               <div class="title">
-                <div class="text">{{$t('PhoneStrip.text21', {TransferAgent: transferData.TransferAgent})}}</div>
+                <div>
+                <div class="text">通话转接来自【{{attachData.TransferAgent}}】，转接原因如下</div>
+                <div class="text">{{attachData.showTransferReason}}</div>
+                </div>
                 <div class="close" @click="showTransferReason = false"><i class="iconfont icon-guanbi2"></i></div>
               </div>
               <div class="info">
-                {{transferData.TransferReason}}
+                {{attachData.TransferReason}}
               </div>
             </div>
           </div>
@@ -131,6 +134,9 @@ export default {
   props: {
     eventType: {
       type: String
+    },
+    attachData: {
+      type: Object
     }
   },
   watch: {
@@ -330,7 +336,7 @@ export default {
       this.currentEventType = 'transferOprate'
     },
     phoneSetCurrentType () {
-      this.currentMapType = this.mapType
+      this.currentEventType = this.backType
     },
     phoneStopConsult() {
       // 结束咨询
@@ -366,7 +372,8 @@ export default {
       })
     },
     toRTCkeys () {
-      this.currentMapType = 'rtckeys'
+      this.backType = this.currentEventType
+      this.currentEventType = 'rtckeys'
     },
     answerClick() {
       this.$store.dispatch('Answer')

@@ -2,7 +2,7 @@
  * @Author: Wangtao
  * @Date: 2022-11-07 14:41:13
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-09-04 15:55:47
+ * @LastEditTime: 2023-09-26 18:58:40
 -->
 <template>
 <div class="key-board-box-warp">
@@ -89,7 +89,7 @@ export default {
     keyClick (key) {
       this.dialoutNumber += key
       if (this.styleType === 'type2') {
-        this.$store.dispatch('sendDTMF', { key: key })
+        webapp.webrtcApi.sendDTMF(key)
       }
     },
     deleteNumber () {

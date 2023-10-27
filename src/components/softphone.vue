@@ -37,7 +37,7 @@
 
 <script>
 let webapp = null
-import SoftPhone from './softphone'
+import SoftPhone from './softphone/index'
 export default {
   name: 'telephone-strip',
   props: {
@@ -249,12 +249,12 @@ export default {
   mounted () {
     let that = this;
     webapp = new SoftPhone({
-    accountId: 'N00000004285',
-    agentNumber: '20011@pkjtest-wh',
+    accountId: 'N00000003731',
+    agentNumber: '30003@dxtest21',
     password: '123456Aa',
     loginType: 'Local',
-    serviceAddress: 'http://10.1.114.23:9500',
-    proxy_url: 'http://10.1.114.11:18082',
+    // serviceAddress: 'http://10.1.114.23:9500',
+    proxy_url: 'https://pbx-bj-salesman02.7moor.com',
     error(e){
       console.log(e)
     },
@@ -272,7 +272,7 @@ export default {
       message: (event) => {
         that.currentType = event.type
         that.currentMap = event.type + '_Local'
-        console.log(event, '通话事件--------------------')
+        console.log(event, '通话事件--------------------000000')
       }
     })
   }

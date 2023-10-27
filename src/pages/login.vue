@@ -2,7 +2,7 @@
  * @Author: Wangtao
  * @Date: 2023-06-28 21:09:36
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-07-07 14:10:36
+ * @LastEditTime: 2023-10-27 11:34:46
 -->
 <template>
 <div id="pubg">
@@ -34,17 +34,32 @@
 </template>
 
 <script>
-  import SoftPhone from '../components/softphone'
+  import SoftPhone from '7moor-softphone-sdk'
+  // import SoftPhone from '../components/softphone/index'
   export default {
       name:'loginindex',
     data() {
       return {
         ruleForm: {
-         username: '20011@pkjtest-wh',
-         password:'123456Aa',
-         pbxUrl: 'http://10.1.114.11:18082',
-         accountId: 'N00000004285'
+          accountId: 'N00000003731',
+          username: '30003@dxtest21',
+          password: '123456Aa',
+          loginType: 'Local',
+          // serviceAddress: 'http://10.1.114.23:9500',
+          pbxUrl: 'https://pbx-bj-salesman02.7moor.com',
         },
+        // ruleForm: {
+        //  username: '6000@testvue',
+        //  password:'123456Aa',
+        //  pbxUrl: 'http://10.1.114.11:18081',
+        //  accountId: 'N00000004555'
+        // },
+        //  ruleForm: {
+        //  username: '20011@pkjtest-wh',
+        //  password:'123456Aa',
+        //  pbxUrl: 'http://10.1.114.11:18082',
+        //  accountId: 'N00000004285'
+        // },
         rules: {
           username: [
             { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -78,8 +93,8 @@
               accountId: that.ruleForm.accountId,
               agentNumber: that.ruleForm.username,
               password: that.ruleForm.password,
-              loginType: 'Local',
-              serviceAddress: 'https://dev-kf.7moor.com:3443',
+              loginType: 'sip',
+              // serviceAddress: 'https://dev-kf.7moor.com:3443',
               proxy_url: that.ruleForm.pbxUrl,
               error(e){
                 console.log(e)

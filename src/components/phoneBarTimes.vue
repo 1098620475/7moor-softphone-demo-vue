@@ -2,7 +2,7 @@
  * @Author: Wangtao
  * @Date: 2021-02-24 16:31:55
  * @LastEditors: Wangtao
- * @LastEditTime: 2023-06-25 15:59:36
+ * @LastEditTime: 2023-09-19 14:23:48
 -->
 <template>
 	<span>{{
@@ -43,22 +43,28 @@ export default {
     },
     countDownInterval () {
       // 话后整理，倒计时
-      let autoBusyTime = 30;
-      autoBusyTime = parseInt(autoBusyTime, 10) - this.currentTime || 0; // 话后整理时长 -  服务端跑的时间(eg: 后处理读秒的时候，刷新系统)
-      if (autoBusyTime < 1) {
-        return;
-      }
-      if (this.phoneBarTimer !== null) {
-        window.clearInterval(this.phoneBarTimer); // 清除定时器
-      }
-      this.phoneBarTimer = window.setInterval(() => {
-        autoBusyTime--;
-        if (autoBusyTime <= 1) {
-          // 倒计时为0的时候，让正计时也为0
-          this.currentTime = 0;
+      let that = this;
+      window.webapp.agentApi.getAgentInfo({
+        success: (res) => {
+          let userInfo = res.data;
+          let autoBusyTime = userInfo.AutoBusyTime ? Number(userInfo.AutoBusyTime) : 30;
+          autoBusyTime = parseInt(autoBusyTime, 10) - that.currentTime || 0; // 话后整理时长 -  服务端跑的时间(eg: 后处理读秒的时候，刷新系统)
+          if (autoBusyTime < 1) {
+            return;
+          }
+          if (that.phoneBarTimer !== null) {
+            window.clearInterval(that.phoneBarTimer); // 清除定时器
+          }
+          that.phoneBarTimer = window.setInterval(() => {
+            autoBusyTime--;
+            if (autoBusyTime <= 1) {
+              // 倒计时为0的时候，让正计时也为0
+              that.currentTime = 0;
+            }
+            that.timing = that.ctiUiAutoBusyTime(autoBusyTime);
+          }, 1000);
         }
-        this.timing = this.ctiUiAutoBusyTime(autoBusyTime);
-      }, 1000);
+      })
     },
     ctiUiGetTimer (countTimer) {
       let minute;
